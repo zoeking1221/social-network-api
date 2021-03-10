@@ -12,9 +12,11 @@ const UserController = {
     },
 
     // get single user by id
-    // still need to populate THOUGHT AND FRIEND DATA (not just id)
     getUserById({ params }, res) {
         User.findOne({ _id: params.id })
+        .populate({
+            path: 'thoughts'
+        })
         .then(dbUserData => res.json(dbUserData))
         .catch(err => {
             console.log(err);
