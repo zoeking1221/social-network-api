@@ -11,7 +11,8 @@ const UserController = {
         });
     },
 
-    // get single user by id AND populate thought and friend data
+    // get single user by id
+    // still need to populate THOUGHT AND FRIEND DATA (not just id)
     getUserById({ params }, res) {
         User.findOne({ _id: params.id })
         .then(dbUserData => res.json(dbUserData))
@@ -48,31 +49,32 @@ const UserController = {
         .catch(err => res.json(err));
     },
 
-    // // add new friend to a user's friend list
-    // addFriend({ params }, res) {
-    //     User.findOneAndUpdate({ _id: params.id }, { new: true })
-    //     .then(dbUserData => {
-    //         if (!dbUserData) {
-    //             res.status(404).json({ message: 'No user found with this id!' });
-    //             return;
-    //         }
-    //         res.json(dbUserData);
-    //     })
-    //     .catch(err => res.json(err));
-    // },
+    // add new friend to a user's friend list
+    addFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $push: { friends: params.friendId } },
+            { new: true })
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(404).json({ message: 'No user found with this id!' });
+                return;
+            }
+            res.json(dbUserData);
+        })
+        .catch(err => res.status(400).json(err));
+    },
 
-    // // remove friend
-    // removeFriend({ params }, res) {
-    //     User.findOneAndUpdate(
-    //         { _id: params.friendId },
-    //         { $pull: { friends: { friendId: params.friendId } } },
-    //         { new: true }
-    //     )
-    //     .then(dbUserData => res.json(dbUserData))
-    //     .catch(err => res.json(err));
-    // }
-
-
+    // remove friend
+    removeFriend({ params }, res) {
+        User.findOneAndUpdate(
+            { _id: params.userId },
+            { $pull: { friends: params.friendId } },
+            { new: true }
+        )
+        .then(dbUserData => res.json(dbUserData))
+        .catch(err => res.json(err));
+    }
 };
 
 module.exports = UserController;
